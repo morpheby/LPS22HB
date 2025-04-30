@@ -75,9 +75,19 @@ class LPS22HBSensor
     LPS22HBStatusTypeDef ReadID         (uint8_t *ht_id);
     LPS22HBStatusTypeDef Reset          (void);
     LPS22HBStatusTypeDef GetPressure    (float *pfData);
+    LPS22HBStatusTypeDef GetPressureSensitivity(int16_t *pfData);
+    LPS22HBStatusTypeDef GetPressureRaw (int32_t *pfData);
     LPS22HBStatusTypeDef GetTemperature (float *pfData);
+    LPS22HBStatusTypeDef GetTemperatureSensitivity(int16_t *pfData);
+    LPS22HBStatusTypeDef GetTemperatureRaw(int16_t *pfData);
 	LPS22HBStatusTypeDef GetODR         (float *odr);
+	LPS22HBStatusTypeDef GetODRRaw      (LPS22HB_Odr_et *odr);
 	LPS22HBStatusTypeDef SetODR         (float odr);
+	LPS22HBStatusTypeDef SetODRRaw      (LPS22HB_Odr_et odr);
+	LPS22HBStatusTypeDef GetFilter      (LPS22HB_State_et *state);
+	LPS22HBStatusTypeDef SetFilter      (LPS22HB_State_et state);
+	LPS22HBStatusTypeDef GetFilterCutoff(LPS22HB_LPF_Cutoff_et *cutoff);
+	LPS22HBStatusTypeDef SetFilterCutoff(LPS22HB_LPF_Cutoff_et cutoff);
 	LPS22HBStatusTypeDef ReadReg        (uint8_t reg, uint8_t *data);
 	LPS22HBStatusTypeDef WriteReg       (uint8_t reg, uint8_t data);
 	

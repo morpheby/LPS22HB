@@ -245,6 +245,25 @@ LPS22HB_Error_et LPS22HB_Get_Odr(void *handle, LPS22HB_Odr_et* odr)
 * @param  state: enable or disable
 * @retval Error Code [LPS22HB_ERROR, LPS22HB_OK]
 */
+LPS22HB_Error_et LPS22HB_Get_LowPassFilter(void *handle, LPS22HB_State_et *state)
+{
+  uint8_t tmp;
+
+  if(LPS22HB_ReadReg(handle, LPS22HB_CTRL_REG1, 1, &tmp))
+    return LPS22HB_ERROR;
+
+  tmp &= LPS22HB_LPFP_MASK;
+  *state = (tmp >> LPS22HB_LPFP_BIT);
+
+  return LPS22HB_OK;
+}
+
+/**
+* @brief  Enable/Disale low-pass filter on LPS22HB pressure data
+* @param  *handle Device handle.
+* @param  state: enable or disable
+* @retval Error Code [LPS22HB_ERROR, LPS22HB_OK]
+*/
 LPS22HB_Error_et LPS22HB_Set_LowPassFilter(void *handle, LPS22HB_State_et state)
 {
   uint8_t tmp;
@@ -265,6 +284,21 @@ LPS22HB_Error_et LPS22HB_Set_LowPassFilter(void *handle, LPS22HB_State_et state)
   return LPS22HB_OK;
 }
 
+/**
+* @brief  Get low-pass filter cutoff configuration on LPS22HB pressure data
+* @param  *handle Device handle.
+* @param  Filter Cutoff ODR/9 or ODR/20
+* @retval Error Code [LPS22HB_ERROR, LPS22HB_OK]
+*/
+LPS22HB_Error_et LPS22HB_Get_LowPassFilterCutoff(void *handle, LPS22HB_LPF_Cutoff_et *cutoff){
+  if(LPS22HB_ReadReg(handle, LPS22HB_CTRL_REG1, 1, cutoff))
+    return LPS22HB_ERROR;
+
+  *cutoff &= LPS22HB_LPFP_CUTOFF_MASK;
+
+  return LPS22HB_OK;
+
+}
 
 /**
 * @brief  Set low-pass filter cutoff configuration on LPS22HB pressure data

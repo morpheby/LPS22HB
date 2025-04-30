@@ -886,8 +886,21 @@ LPS22HB_Error_et LPS22HB_Get_Odr(void *handle, LPS22HB_Odr_et* odr);
 * @param  state: enable or disable
 * @retval Error Code [LPS22HB_ERROR, LPS22HB_OK]
 */
+LPS22HB_Error_et LPS22HB_Get_LowPassFilter(void *handle, LPS22HB_State_et *state);
+
+/**
+* @brief  Enable/Disale low-pass filter on LPS22HB pressure data
+* @param  state: enable or disable
+* @retval Error Code [LPS22HB_ERROR, LPS22HB_OK]
+*/
 LPS22HB_Error_et LPS22HB_Set_LowPassFilter(void *handle, LPS22HB_State_et state);
 
+/**
+* @brief  Get low-pass filter cutoff configuration on LPS22HB pressure data
+* @param Filter Cutoff ODR/9 or ODR/20
+* @retval Error Code [LPS22HB_ERROR, LPS22HB_OK]
+*/
+LPS22HB_Error_et LPS22HB_Get_LowPassFilterCutoff(void *handle, LPS22HB_LPF_Cutoff_et *cutoff);
 
 /**
 * @brief  Set low-pass filter cutoff configuration on LPS22HB pressure data
@@ -1055,7 +1068,7 @@ LPS22HB_Error_et LPS22HB_ResetAutoRifP(void *handle);
 
 /**?????
 * @brief  Set AutoZero Function bit
-* @detail When set to ‘1’, the actual pressure output is copied in the REF_P reg (@0x15..0x17)
+* @detail When set to ï¿½1ï¿½, the actual pressure output is copied in the REF_P reg (@0x15..0x17)
 * @param  None
 * @retval  Error Code [LPS22HB_ERROR, LPS22HB_OK]
 */
@@ -1147,7 +1160,7 @@ LPS22HB_Error_et LPS22HB_Get_Pressure(void *handle, int32_t* Pout);
 LPS22HB_Error_et LPS22HB_Get_RawTemperature(void *handle, int16_t *raw_data);
 
 /**
-* @brief  Read the Temperature value in °C.
+* @brief  Read the Temperature value in ï¿½C.
 * @param  The buffer to empty with the temperature value that must be divided by 10 to get the value in ['C]
 * @retval Error Code [LPS22HB_ERROR, LPS22HB_OK]
 */

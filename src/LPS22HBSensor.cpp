@@ -79,7 +79,7 @@ LPS22HBStatusTypeDef LPS22HBSensor::begin(void)
     digitalWrite(cs_pin, HIGH); 
   }
 
-  if ( LPS22HB_Set_PowerMode( (void *)this, LPS22HB_LowPower) == LPS22HB_ERROR )
+  if ( LPS22HB_Set_PowerMode( (void *)this, LPS22HB_LowNoise) == LPS22HB_ERROR )
   {
     return LPS22HB_STATUS_ERROR;
   }
@@ -227,7 +227,7 @@ LPS22HBStatusTypeDef LPS22HBSensor::Reset(void)
 
 /**
  * @brief  Read LPS22HB output register, and calculate the pressure in mbar
- * @param  pfData the pressure value in mbar
+ * @param  pfData the pressure value in hPa
  * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
  */
 LPS22HBStatusTypeDef LPS22HBSensor::GetPressure(float* pfData)
@@ -235,12 +235,39 @@ LPS22HBStatusTypeDef LPS22HBSensor::GetPressure(float* pfData)
   int32_t int32data = 0;
 
   /* Read data from LPS22HB. */
-  if ( LPS22HB_Get_Pressure( (void *)this, &int32data ) == LPS22HB_ERROR )
+  if ( LPS22HB_Get_RawPressure( (void *)this, &int32data ) == LPS22HB_ERROR )
   {
     return LPS22HB_STATUS_ERROR;
   }
 
-  *pfData = ( float )int32data / 100.0f;
+  *pfData = ( float )int32data / 4096.0f;
+
+  return LPS22HB_STATUS_OK;
+}
+
+/**
+ * @brief  Get LPS22HB sensitivity in LSB/hPa
+ * @param  pfData the sensitivity value
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::GetPressureSensitivity(int16_t* pfData)
+{
+  pfData[0] = 4096;
+  return LPS22HB_STATUS_OK;
+}
+
+/**
+ * @brief  Read LPS22HB output register
+ * @param  pfData the pressure value
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::GetPressureRaw(int32_t* pfData)
+{
+  /* Read data from LPS22HB. */
+  if ( LPS22HB_Get_RawPressure( (void *)this, pfData ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
 
   return LPS22HB_STATUS_OK;
 }
@@ -255,12 +282,39 @@ LPS22HBStatusTypeDef LPS22HBSensor::GetTemperature(float *pfData)
   int16_t int16data = 0;
 
   /* Read data from LPS22HB. */
-  if ( LPS22HB_Get_Temperature( (void *)this, &int16data ) == LPS22HB_ERROR )
+  if ( LPS22HB_Get_RawTemperature( (void *)this, &int16data ) == LPS22HB_ERROR )
   {
     return LPS22HB_STATUS_ERROR;
   }
 
-  *pfData = ( float )int16data / 10.0f;
+  *pfData = ( float )int16data / 100.0f;
+
+  return LPS22HB_STATUS_OK;
+}
+
+/**
+ * @brief  Get LPS22HB sensitivity in LSB/degC
+ * @param  pfData the sensitivity value
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::GetTemperatureSensitivity(int16_t* pfData)
+{
+  pfData[0] = 100;
+  return LPS22HB_STATUS_OK;
+}
+
+/**
+ * @brief  Read LPS22HB output register
+ * @param  pfData the temperature value
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::GetTemperatureRaw(int16_t *pfData)
+{
+  /* Read data from LPS22HB. */
+  if ( LPS22HB_Get_RawTemperature( (void *)this, pfData ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
 
   return LPS22HB_STATUS_OK;
 }
@@ -308,6 +362,21 @@ LPS22HBStatusTypeDef LPS22HBSensor::GetODR(float* odr)
 }
 
 /**
+ * @brief  Read LPS22HB output data rate
+ * @param  odr the pointer to the output data rate
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::GetODRRaw(LPS22HB_Odr_et* odr)
+{
+  if ( LPS22HB_Get_Odr( (void *)this, odr ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
+
+  return LPS22HB_STATUS_OK;
+}
+
+/**
  * @brief  Set ODR
  * @param  odr the output data rate to be set
  * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
@@ -332,6 +401,26 @@ LPS22HBStatusTypeDef LPS22HBSensor::SetODR(float odr)
   return LPS22HB_STATUS_OK;
 }
 
+/**
+ * @brief  Set ODR
+ * @param  odr the output data rate to be set
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::SetODRRaw(LPS22HB_Odr_et odr)
+{
+  if ( LPS22HB_Set_Odr( (void *)this, odr ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
+
+  if (odr != LPS22HB_ODR_ONE_SHOT) {
+    isEnabled = 1;
+  } else {
+    isEnabled = false;
+  }
+
+  return LPS22HB_STATUS_OK;
+}
 
 /**
  * @brief Set the LPS22HB sensor output data rate when enabled
@@ -379,6 +468,65 @@ LPS22HBStatusTypeDef LPS22HBSensor::SetODR_When_Disabled( float odr )
   return LPS22HB_STATUS_OK;
 }
 
+/**
+ * @brief  Read LPS22HB filter state
+ * @param  state the pointer to the output state
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::GetFilter(LPS22HB_State_et* state)
+{
+  if ( LPS22HB_Get_LowPassFilter( (void *)this, state ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
+
+  return LPS22HB_STATUS_OK;
+}
+
+/**
+ * @brief  Set LPS22HB filter state
+ * @param  state Filter state
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::SetFilter(LPS22HB_State_et state)
+{
+  if ( LPS22HB_Set_LowPassFilter( (void *)this, state ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
+
+  return LPS22HB_STATUS_OK;
+}
+
+/**
+ * @brief  Read LPS22HB filter cutoff value
+ * @param  state the pointer to the output cutoff
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::GetFilterCutoff(LPS22HB_LPF_Cutoff_et* cutoff)
+{
+  if ( LPS22HB_Get_LowPassFilterCutoff( (void *)this, cutoff ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
+
+  return LPS22HB_STATUS_OK;
+}
+
+/**
+ * @brief  Set LPS22HB filter cutoff value
+ * @param  state Filter cutoff
+ * @retval LPS22HB_STATUS_OK in case of success, an error code otherwise
+ */
+LPS22HBStatusTypeDef LPS22HBSensor::SetFilterCutoff(LPS22HB_LPF_Cutoff_et cutoff)
+{
+  if ( LPS22HB_Set_LowPassFilterCutoff( (void *)this, cutoff ) == LPS22HB_ERROR )
+  {
+    return LPS22HB_STATUS_ERROR;
+  }
+
+  return LPS22HB_STATUS_OK;
+}
 
 /**
  * @brief Read the data from register
