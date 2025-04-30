@@ -114,6 +114,20 @@ LPS22HBStatusTypeDef LPS22HBSensor::begin(void)
     return LPS22HB_STATUS_ERROR;
   }
 
+  if (dev_spi) {
+    /* Set 4-wire mode */
+    if( LPS22HB_Set_SpiInterface( (void *)this, LPS22HB_SPI_4_WIRE) == LPS22HB_ERROR )
+    {
+      return LPS22HB_STATUS_ERROR;
+    }
+
+    /* Disable I2C */
+    if( LPS22HB_Set_I2C( (void *)this, LPS22HB_DISABLE) == LPS22HB_ERROR )
+    {
+      return LPS22HB_STATUS_ERROR;
+    }
+  }
+
   isEnabled = 0;
   Last_ODR = 25.0f;
 
